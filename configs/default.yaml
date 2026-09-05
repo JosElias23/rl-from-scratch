@@ -1,0 +1,46 @@
+# Single source of truth for every parameter that affects a reported number.
+
+seed: 42
+
+frozenlake:
+  env_id: FrozenLake-v1
+  map_name: "4x4"
+  is_slippery: true          # the interesting case: intended moves succeed 1/3 of the time
+  n_episodes: 200000
+  eval_episodes: 5000        # large, because a success rate near 0.74 needs a tight interval
+  eval_every: 5000
+  agent:
+    learning_rate: 0.1
+    discount: 0.99
+    epsilon_start: 1.0
+    epsilon_end: 0.01
+    # Slow decay. FrozenLake's reward is sparse -- one point, only on reaching
+    # the goal -- so an agent that stops exploring early may never have seen a
+    # success to learn from.
+    epsilon_decay: 0.99995
+    optimistic_init: 0.0
+
+cartpole:
+  env_id: CartPole-v1
+  n_episodes: 60000
+  eval_episodes: 500
+  eval_every: 2000
+  max_steps: 500             # CartPole-v1 truncates here; 475 is the "solved" bar
+  bins: 6                    # 6^4 = 1296 discrete states
+  agent:
+    learning_rate: 0.1
+    discount: 0.99
+    epsilon_start: 1.0
+    epsilon_end: 0.01
+    epsilon_decay: 0.9997
+    # Optimistic initialisation drives early exploration: every unvisited
+    # action looks better than any visited one until tried.
+    optimistic_init: 0.0
+
+planning:
+  discount: 0.99
+  tolerance: 1.0e-12
+
+paths:
+  reports_dir: reports
+  figures_dir: reports/figures
