@@ -1,0 +1,106 @@
+{
+  "environment": {
+    "id": "FrozenLake-v1",
+    "is_slippery": true,
+    "map": "4x4",
+    "n_actions": 4,
+    "n_states": 16,
+    "time_limit_steps": 100
+  },
+  "eval_episodes": 5000,
+  "results": {
+    "q_learning": {
+      "ci95_lower": 0.7254,
+      "ci95_upper": 0.7498,
+      "episodes": 200000,
+      "final_epsilon": 0.01,
+      "fraction_of_ceiling": 0.9914,
+      "mean_length": 44.3,
+      "policy": [
+        "<",
+        "^",
+        "^",
+        "^",
+        "<",
+        "<",
+        "<",
+        "<",
+        "^",
+        "v",
+        "<",
+        "<",
+        "<",
+        ">",
+        "v",
+        "<"
+      ],
+      "policy_agreement_with_optimal": 1.0,
+      "statistically_indistinguishable_from_optimal": true,
+      "success_rate": 0.7378,
+      "train_seconds": 109.0
+    },
+    "random": {
+      "mean_length": 7.77,
+      "success_rate": 0.012
+    },
+    "sarsa": {
+      "ci95_lower": 0.7254,
+      "ci95_upper": 0.7498,
+      "episodes": 200000,
+      "final_epsilon": 0.01,
+      "fraction_of_ceiling": 0.9914,
+      "mean_length": 44.3,
+      "policy": [
+        "<",
+        "^",
+        "^",
+        "^",
+        "<",
+        "<",
+        "<",
+        "<",
+        "^",
+        "v",
+        "<",
+        "<",
+        "<",
+        ">",
+        "v",
+        "<"
+      ],
+      "policy_agreement_with_optimal": 1.0,
+      "statistically_indistinguishable_from_optimal": true,
+      "success_rate": 0.7378,
+      "train_seconds": 102.1
+    },
+    "value_iteration": {
+      "gain_from_time_awareness": 0.004,
+      "policy": [
+        "<",
+        "^",
+        "^",
+        "^",
+        "<",
+        "<",
+        "<",
+        "<",
+        "^",
+        "v",
+        "<",
+        "<",
+        "<",
+        ">",
+        "v",
+        "<"
+      ],
+      "seconds": 0.022,
+      "success_rate": 0.7442,
+      "success_rate_stationary_simulated": 0.7378,
+      "success_rate_stationary_under_cap": 0.7402,
+      "success_rate_time_aware_optimum": 0.7442,
+      "success_rate_unbounded_horizon": 0.8235,
+      "sweeps": 516,
+      "value_of_start_state": 0.542026
+    }
+  }
+}
