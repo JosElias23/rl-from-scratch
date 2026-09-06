@@ -1,5 +1,10 @@
 # Tabular reinforcement learning, and what "optimal" actually means
 
+[![CI](https://github.com/JosElias23/rl-from-scratch/actions/workflows/ci.yml/badge.svg)](https://github.com/JosElias23/rl-from-scratch/actions/workflows/ci.yml)
+[![tests](https://img.shields.io/badge/tests-37%20passing-brightgreen)](https://github.com/JosElias23/rl-from-scratch/actions/workflows/ci.yml)
+[![python](https://img.shields.io/badge/python-3.10%20%7C%203.12-blue)](pyproject.toml)
+[![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
 Q-learning and SARSA written from first principles — no RL library anywhere —
 and measured against optima computed exactly by dynamic programming rather than
 against numbers quoted from the internet.
