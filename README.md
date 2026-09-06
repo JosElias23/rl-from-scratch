@@ -5,8 +5,8 @@
 [![python](https://img.shields.io/badge/python-3.10%20%7C%203.12-blue)](pyproject.toml)
 [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-Q-learning and SARSA written from first principles — no RL library anywhere —
-and measured against optima computed exactly by dynamic programming rather than
+Q-learning and SARSA written from first principles, no RL library anywhere, and
+measured against optima computed exactly by dynamic programming rather than
 against numbers quoted from the internet.
 
 The algorithms are the easy part. The interesting work is deciding what to
@@ -28,13 +28,13 @@ quotes for "optimal" on FrozenLake is the answer to a different question.
 
 ![FrozenLake results](reports/figures/frozenlake_results.png)
 
-Both agents recover the optimal **stationary** policy exactly — every one of the
+Both agents recover the optimal **stationary** policy exactly. Every one of the
 16 states gets the action value iteration chose. Their measured success rate
 equals what that policy scores when simulated, to four decimal places.
 
 The remaining 0.64 percentage points are not a training failure. They are
-precisely the value of knowing how much time is left, which no stationary
-policy can represent. More on that below.
+precisely the value of knowing how much time is left, which no stationary policy
+can represent. More on that below.
 
 ---
 
@@ -55,10 +55,10 @@ the published transition model gives:
 All three are correct. They answer different questions, and quoting one without
 naming the horizon is meaningless.
 
-**Why the time limit costs so much.** The optimal policy is deliberately slow.
-It hugs walls and accepts sideways slides so that no unlucky slip can push it
-into a hole, which means crossing a 4×4 grid often takes far more than 100
-steps. Gymnasium's default `TimeLimit` truncates those eventual successes:
+Why the time limit costs so much. The optimal policy is deliberately slow. It
+hugs walls and accepts sideways slides so that no unlucky slip can push it into
+a hole, which means crossing a 4×4 grid often takes far more than 100 steps.
+Gymnasium's default `TimeLimit` truncates those eventual successes:
 
 ```
 horizon    50   ->  0.5356
@@ -69,9 +69,9 @@ unbounded       ->  0.8235
 ```
 
 **Why a stationary policy cannot reach even the 100-step optimum.** A policy
-that knows it has ten steps left should stop playing safe and gamble on a
-direct dash. The optimum for a time-limited objective is therefore
-*non-stationary*, and backward induction finds it:
+that knows it has ten steps left should stop playing safe and gamble on a direct
+dash. The optimum for a time-limited objective is therefore *non-stationary*,
+and backward induction finds it:
 
 ```
 V_0(s) = 0
@@ -84,13 +84,13 @@ plays action `Left`; with 10 remaining it switches to `Right` and runs for it.
 
 Both figures are verified against 20,000 simulated episodes, and CI recomputes
 all three on every push. `tests/test_planning.py` asserts that backward
-induction agrees with simulating the resulting policy — if the ceiling were
+induction agrees with simulating the resulting policy. If the ceiling were
 wrong, every percentage in this README would be wrong with it.
 
 > **This corrects a claim I had previously made about my own work.** A CV bullet
-> of mine described 73 % on this task as "nearly the theoretical optimum
-> (~74 %)". The 74 % figure is the 100-step ceiling, and the theoretical optimum
-> is 82.35 %. The accurate statement is the stronger one: the agent recovers the
+> of mine described 73 % on this task as "nearly the theoretical optimum (~74
+> %)". The 74 % figure is the 100-step ceiling, and the theoretical optimum is
+> 82.35 %. The accurate statement is the stronger one: the agent recovers the
 > optimal stationary policy exactly and scores 99.1 % of what any policy could
 > achieve under the same time limit.
 
@@ -124,21 +124,21 @@ to converge. Seven resolutions × five seeds each, 60,000 episodes per run:
 | 10 | 10,000 | 33 % | 456.6 | 59.1 | 356–500 | 5/5 |
 | 12 | 20,736 | 27 % | **473.4** | **33.8** | 415–500 | 5/5 |
 
-**The second half of the textbook story never arrives.** At 12 bins the agent
-visits 27 % of 20,736 cells and is still the best configuration tested, and the
-only one that never fails. Unvisited cells turn out to be *unreachable* states,
-not neglected ones: a pole at 20° with the cart accelerating the other way is a
+The second half of the textbook story never arrives. At 12 bins the agent visits
+27 % of 20,736 cells and is still the best configuration tested, and the only
+one that never fails. Unvisited cells turn out to be *unreachable* states, not
+neglected ones: a pole at 20° with the cart accelerating the other way is a
 configuration the dynamics never produce. Finer bins mostly subdivide empty
 space.
 
 What resolution actually buys is **reliability**. The means from 4 to 12 bins
 are statistically indistinguishable; the standard deviation across seeds
 collapses from 177.7 to 33.8. Coarse discretisation does not give a worse agent
-on average — it gives a lottery. Three bins solved the task twice in five runs
+on average; it gives a lottery. Three bins solved the task twice in five runs
 and scored 100 in another.
 
 An earlier single-seed version of this sweep produced 499.8 at 3 bins, 38.7 at
-4, and 500.0 at 5. That is not a curve, it is noise, and it is why this
+4, and 500.0 at 5. That is not a curve; it is noise, and it is why this
 experiment reports seeds rather than runs.
 
 ### Q-learning versus SARSA: an honest non-result
@@ -154,16 +154,16 @@ evaluation on 300 episodes:
 Paired over the seeds they share, Q-learning leads by **+129.8 return, 95 % CI
 [−15.0, +274.6]**. The interval covers zero.
 
-**So the honest answer is that this experiment cannot separate them.** The
-point estimate and the solve counts both favour Q-learning, and the direction is
-consistent with theory — Q-learning learns the greedy policy's value regardless
+So the honest answer is that this experiment cannot separate them. The point
+estimate and the solve counts both favour Q-learning, and the direction is
+consistent with theory. Q-learning learns the greedy policy's value regardless
 of exploration, while SARSA's on-policy target keeps punishing it for the
-ε-greedy moves that end an episode. But eight seeds against a standard
-deviation near 100 is not enough power to call it, and a README that claimed a
-winner here would be claiming something that does not replicate.
+ε-greedy moves that end an episode. But eight seeds against a standard deviation
+near 100 is not enough power to call it, and a README that claimed a winner here
+would be claiming something that does not replicate.
 
 The evidence for that is in this repository's own history. A single-seed run
-scored Q-learning 408.41 and SARSA 500.00 — the reverse of the eight-seed
+scored Q-learning 408.41 and SARSA 500.00, the reverse of the eight-seed
 ranking. An earlier run, before the random-stream bug was fixed, scored
 Q-learning 500.00 and SARSA 294.07. Three experiments, three different stories,
 one underpowered design.
@@ -189,20 +189,20 @@ greedy.
 
 ### Three bugs this project documents
 
-**Terminal states must not bootstrap.** `r + γ·V(s')` past a terminal state
-invents value that does not exist. On a sparse-reward task it makes the agent
+Terminal states must not bootstrap. `r + γ·V(s')` past a terminal state invents
+value that does not exist. On a sparse-reward task it makes the agent
 confidently wrong, and nothing raises.
 
-**Ties must break randomly.** With a zero-initialised table every action ties.
+Ties must break randomly. With a zero-initialised table every action ties.
 `argmax` returns index 0 every time, so the agent explores far more slowly than
-ε alone implies — a silent bug that merely looks like slow learning.
+ε alone implies. A silent bug that merely looks like slow learning.
 
-**Evaluation must not consume the training random stream.** Greedy action
-selection still needs randomness for tie-breaking. It was drawing from the
-training generator, so inserting a periodic evaluation shifted every subsequent
-training decision. Found by noticing two runs with identical seeds and
-hyperparameters disagreed — 500.00 with periodic evaluation, 288.47 without.
-Measuring the agent was changing the agent. `tests/test_agents.py` now pins it.
+Evaluation must not consume the training random stream. Greedy action selection
+still needs randomness for tie-breaking. It was drawing from the training
+generator, so inserting a periodic evaluation shifted every subsequent training
+decision. Found by noticing two runs with identical seeds and hyperparameters
+disagreed, 500.00 with periodic evaluation, 288.47 without. Measuring the agent
+was changing the agent. `tests/test_agents.py` now pins it.
 
 ### Evaluation protocol
 
@@ -298,4 +298,4 @@ to say anything honest about.
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT, see [LICENSE](LICENSE). 
