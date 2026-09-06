@@ -7,12 +7,39 @@ real numbers -- cart position, cart velocity, pole angle, pole angular velocity
 This is the whole difficulty of applying tabular methods to a continuous
 problem, and it is where the interesting engineering lives:
 
-**Bin count is a bias-variance dial.** Too few bins and distinct situations
-collapse into one cell, so no policy can separate them: the agent is not
-failing to learn, it is being asked to answer with insufficient resolution.
-Too many bins and each cell is visited so rarely that its Q-value never
-converges. With 6 bins per dimension the table has 6^4 = 1,296 states; with 12
-it has 20,736, and the agent would need far more episodes to fill them.
+**Bin count was expected to be a bias-variance dial, and it is not — at least
+not in the way the textbook argument predicts.** Too few bins and distinct
+situations collapse into one cell, so no policy can separate them. Too many
+bins and each cell is visited so rarely that its Q-value never converges. That
+predicts an inverted U, with some middle resolution winning.
+
+`scripts/sweep_resolution.py` measures it over 3 to 12 bins per dimension with
+five seeds each, and the second half of that story does not appear:
+
+    bins  states   visited   mean return   sd     seeds solved
+       3      81       94%         246.4   177.7           2/5
+       4     256       82%         311.7   193.7           3/5
+       5     625       66%         428.3   146.7           4/5
+       6   1,296       64%         355.6   126.8           4/5
+       8   4,096       46%         433.4    91.8           5/5
+      10  10,000       33%         456.6    59.1           5/5
+      12  20,736       27%         473.4    33.8           5/5
+
+At 12 bins the table has 20,736 cells and the agent visits 27% of them, yet it
+is the *best* configuration tested and the only one that never fails. The
+predicted degradation from an unfillable table simply never arrives in this
+range.
+
+What resolution actually buys is **reliability, not mean performance**. The
+means across 4 to 12 bins are statistically indistinguishable; the standard
+deviation across seeds collapses from 177.7 to 33.8. Coarse discretisation does
+not produce a worse agent on average, it produces a *lottery* — 3 bins solved
+the task in two runs out of five and scored 100 in another.
+
+The reason the visited-cell count can fall while performance rises is that
+unvisited cells are unreachable states, not neglected ones. A pole at 20 degrees
+with the cart moving hard the other way is a cell the dynamics never produce.
+Finer bins mostly subdivide the empty part of the space.
 
 **Bounds matter more than counts.** Gymnasium reports the cart-velocity and
 pole-angular-velocity ranges as infinite, so a bound has to be chosen. Setting

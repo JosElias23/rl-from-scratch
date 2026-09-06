@@ -137,6 +137,28 @@ class TestActionSelection:
             agent.decay_epsilon()
         assert agent.epsilon == pytest.approx(0.1)
 
+    def test_evaluation_does_not_disturb_the_training_stream(self):
+        """Measuring the agent must not change the agent.
+
+        Greedy action selection still needs randomness to break ties. If it
+        drew from the training generator, inserting a periodic evaluation would
+        shift every subsequent training decision -- and it did: the same seed
+        and hyperparameters scored 500.00 on CartPole with periodic evaluation
+        and 288.47 without, before the two streams were separated.
+        """
+        def training_actions(with_evaluation: bool) -> list[int]:
+            agent = QLearningAgent(4, 3, epsilon_start=0.5, seed=7)
+            actions = []
+            for step in range(200):
+                actions.append(agent.act(step % 4))
+                if with_evaluation and step % 10 == 0:
+                    # A stand-in for an evaluation pass.
+                    for s in range(4):
+                        agent.act(s, greedy=True)
+            return actions
+
+        assert training_actions(False) == training_actions(True)
+
     def test_random_agent_ignores_the_state(self):
         agent = RandomAgent(n_actions=3, seed=0)
         chosen = {agent.act(state) for state in range(50) for _ in range(10)}

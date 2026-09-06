@@ -53,6 +53,17 @@ class TabularAgent:
         self.epsilon_end = epsilon_end
         self.epsilon_decay = epsilon_decay
         self.rng = np.random.default_rng(seed)
+        # Evaluation draws from its own stream. Greedy action selection still
+        # needs randomness for tie-breaking, and if it consumed the training
+        # generator then running a periodic evaluation would change every
+        # subsequent training decision.
+        #
+        # This is not hypothetical. Before the split, training with periodic
+        # evaluation scored 500.00 on CartPole and training without it scored
+        # 288.47 from the same seed and the same hyperparameters -- the two runs
+        # differed only in how many random numbers evaluation had consumed.
+        # Measuring the agent was changing the agent.
+        self.eval_rng = np.random.default_rng(seed + 1_000_003)
         # Optimistic initialisation is a form of exploration in itself: unvisited
         # actions look good, so the agent tries them before settling.
         self.q = np.full((n_states, n_actions), optimistic_init, dtype=np.float64)
@@ -65,11 +76,12 @@ class TabularAgent:
         a deterministic argmax would make the agent always pick action 0 and
         explore far more slowly than epsilon alone suggests.
         """
-        if not greedy and self.rng.random() < self.epsilon:
-            return int(self.rng.integers(self.n_actions))
+        rng = self.eval_rng if greedy else self.rng
+        if not greedy and rng.random() < self.epsilon:
+            return int(rng.integers(self.n_actions))
         row = self.q[state]
         best = np.flatnonzero(row == row.max())
-        return int(self.rng.choice(best))
+        return int(rng.choice(best))
 
     def decay_epsilon(self) -> None:
         self.epsilon = max(self.epsilon_end, self.epsilon * self.epsilon_decay)
@@ -139,10 +151,12 @@ class RandomAgent:
     def __init__(self, n_actions: int, seed: int = 42) -> None:
         self.n_actions = n_actions
         self.rng = np.random.default_rng(seed)
+        self.eval_rng = np.random.default_rng(seed + 1_000_003)
         self.epsilon = 0.0
 
     def act(self, state: int, greedy: bool = False) -> int:
-        return int(self.rng.integers(self.n_actions))
+        rng = self.eval_rng if greedy else self.rng
+        return int(rng.integers(self.n_actions))
 
     def decay_epsilon(self) -> None:
         pass
