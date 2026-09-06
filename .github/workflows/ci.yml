@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install
+        run: pip install -e ".[dev]"
+
+      - name: Lint
+        run: ruff check .
+
+      - name: Test
+        run: pytest -q
+
+  # The exact optima are the denominator of every headline number in the README.
+  # If value iteration or backward induction ever drifts, every reported
+  # percentage silently becomes wrong, so CI recomputes them and asserts the
+  # published values.
+  verify-published-optima:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e ".[dev]"
+      - name: Recompute the FrozenLake ceilings
+        run: |
+          python - <<'PY'
+          import sys
+          sys.path.insert(0, "src")
+          import gymnasium as gym
+          from rlfs.planning import (
+              exact_success_probability,
+              finite_horizon_optimum,
+              value_iteration,
+          )
+
+          env = gym.make("FrozenLake-v1", map_name="4x4", is_slippery=True)
+          horizon = env.spec.max_episode_steps
+          _, policy, _ = value_iteration(env, discount=0.99, tolerance=1e-13)
+
+          unbounded = exact_success_probability(env, policy, max_steps=100_000)
+          capped = exact_success_probability(env, policy, max_steps=horizon)
+          ceiling, _ = finite_horizon_optimum(env, horizon)
+
+          print(f"unbounded            {unbounded:.6f}  (README: 0.8235)")
+          print(f"stationary @ {horizon:3d}     {capped:.6f}  (README: 0.7402)")
+          print(f"time-aware @ {horizon:3d}     {ceiling:.6f}  (README: 0.7442)")
+
+          assert abs(unbounded - 0.8235) < 5e-4, unbounded
+          assert abs(capped - 0.7402) < 5e-4, capped
+          assert abs(ceiling - 0.7442) < 5e-4, ceiling
+          print("All published optima reproduce.")
+          PY
