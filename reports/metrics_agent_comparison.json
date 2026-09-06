@@ -1,0 +1,144 @@
+{
+  "bins": 6,
+  "episodes_per_run": 60000,
+  "eval_episodes": 300,
+  "paired_comparison": {
+    "ci95_lower": -15.01,
+    "ci95_upper": 274.62,
+    "mean_difference_q_minus_sarsa": 129.8,
+    "n_paired_seeds": 8,
+    "seeds_q_learning_wins": 7,
+    "seeds_sarsa_wins": 1,
+    "significant": false
+  },
+  "runs": [
+    {
+      "agent": "q_learning",
+      "mean_return": 500.0,
+      "seed": 42,
+      "solved": true
+    },
+    {
+      "agent": "q_learning",
+      "mean_return": 499.28,
+      "seed": 1042,
+      "solved": true
+    },
+    {
+      "agent": "q_learning",
+      "mean_return": 461.99,
+      "seed": 2042,
+      "solved": true
+    },
+    {
+      "agent": "q_learning",
+      "mean_return": 496.17,
+      "seed": 3042,
+      "solved": true
+    },
+    {
+      "agent": "q_learning",
+      "mean_return": 399.14,
+      "seed": 4042,
+      "solved": true
+    },
+    {
+      "agent": "q_learning",
+      "mean_return": 276.2,
+      "seed": 5042,
+      "solved": true
+    },
+    {
+      "agent": "q_learning",
+      "mean_return": 330.84,
+      "seed": 6042,
+      "solved": true
+    },
+    {
+      "agent": "q_learning",
+      "mean_return": 493.48,
+      "seed": 7042,
+      "solved": true
+    },
+    {
+      "agent": "sarsa",
+      "mean_return": 121.46,
+      "seed": 42,
+      "solved": false
+    },
+    {
+      "agent": "sarsa",
+      "mean_return": 315.6,
+      "seed": 1042,
+      "solved": true
+    },
+    {
+      "agent": "sarsa",
+      "mean_return": 334.73,
+      "seed": 2042,
+      "solved": true
+    },
+    {
+      "agent": "sarsa",
+      "mean_return": 386.95,
+      "seed": 3042,
+      "solved": true
+    },
+    {
+      "agent": "sarsa",
+      "mean_return": 286.3,
+      "seed": 4042,
+      "solved": true
+    },
+    {
+      "agent": "sarsa",
+      "mean_return": 500.0,
+      "seed": 5042,
+      "solved": true
+    },
+    {
+      "agent": "sarsa",
+      "mean_return": 133.44,
+      "seed": 6042,
+      "solved": false
+    },
+    {
+      "agent": "sarsa",
+      "mean_return": 340.19,
+      "seed": 7042,
+      "solved": true
+    }
+  ],
+  "seeds": [
+    42,
+    1042,
+    2042,
+    3042,
+    4042,
+    5042,
+    6042,
+    7042
+  ],
+  "summary": {
+    "q_learning": {
+      "max_return": 500.0,
+      "mean_return": 432.14,
+      "median_return": 477.74,
+      "min_return": 276.2,
+      "n_seeds": 8,
+      "seeds_solved": 8,
+      "std_return": 87.45,
+      "stderr_return": 30.92
+    },
+    "sarsa": {
+      "max_return": 500.0,
+      "mean_return": 302.33,
+      "median_return": 325.17,
+      "min_return": 121.46,
+      "n_seeds": 8,
+      "seeds_solved": 6,
+      "std_return": 125.58,
+      "stderr_return": 44.4
+    }
+  }
+}

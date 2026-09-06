@@ -1,0 +1,47 @@
+{
+  "discretisation": {
+    "bins_per_dimension": 6,
+    "n_states": 1296
+  },
+  "environment": {
+    "id": "CartPole-v1",
+    "max_steps": 500,
+    "solved_threshold": 195.0
+  },
+  "eval_episodes": 500,
+  "results": {
+    "q_learning": {
+      "bins": 6,
+      "ci95_lower": 400.6,
+      "ci95_upper": 416.22,
+      "episodes": 60000,
+      "fraction_of_max": 0.8168,
+      "mean_return": 408.41,
+      "n_table_states": 1296,
+      "solved": true,
+      "states_visited": 803,
+      "std_return": 89.09,
+      "stderr_return": 3.984,
+      "train_seconds": 963.6
+    },
+    "random": {
+      "mean_return": 21.74,
+      "solved": false,
+      "std_return": 11.77
+    },
+    "sarsa": {
+      "bins": 6,
+      "ci95_lower": 500.0,
+      "ci95_upper": 500.0,
+      "episodes": 60000,
+      "fraction_of_max": 1.0,
+      "mean_return": 500.0,
+      "n_table_states": 1296,
+      "solved": true,
+      "states_visited": 840,
+      "std_return": 0.0,
+      "stderr_return": 0.0,
+      "train_seconds": 703.3
+    }
+  }
+}
