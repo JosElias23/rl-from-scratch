@@ -94,6 +94,9 @@ wrong, every percentage in this README would be wrong with it.
 > optimal stationary policy exactly and scores 99.1 % of what any policy could
 > achieve under the same time limit.
 
+The decision log, including the single-seed result that had to be corrected, is
+in [`docs/DECISIONS.md`](docs/DECISIONS.md).
+
 ---
 
 ## CartPole: what a continuous state space costs
