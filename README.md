@@ -136,11 +136,23 @@ neglected ones: a pole at 20° with the cart accelerating the other way is a
 configuration the dynamics never produce. Finer bins mostly subdivide empty
 space.
 
-What resolution actually buys is **reliability**. The means from 4 to 12 bins
-are statistically indistinguishable; the standard deviation across seeds
-collapses from 177.7 to 33.8. Coarse discretisation does not give a worse agent
-on average; it gives a lottery. Three bins solved the task twice in five runs
-and scored 100 in another.
+Resolution buys both, and the first version of this README got the split wrong.
+It said the means were statistically indistinguishable and only the spread
+improved. That conclusion came from checking whether 95% intervals overlapped,
+which is not a test of a difference and is far too conservative — and it threw
+away the fact that bin count is *ordered*. A trend test over the same 35 runs
+finds **+106.3 return per doubling of bins, p = 0.0020** (Spearman ρ = +0.364,
+p = 0.0315), and pooling 3–4 bins against 10–12 gives Welch **p = 0.0095**.
+There is a mean effect; the pairwise view simply could not localise it to any
+adjacent pair.
+
+The spread does improve too, from 177.7 to 33.8 — but part of that is arithmetic
+rather than reliability. Return is capped at 500, so the largest standard
+deviation a mean of *m* can have is √(m(500−m)): 250 at m = 246, only 112 at
+m = 473. Normalise by that ceiling and the 5.26× collapse becomes **2.36×**.
+Coarse discretisation does give a lottery — three bins solved the task twice in
+five runs and scored 100 in another — but it also gives a worse agent on
+average, and the earlier wording denied the second half.
 
 An earlier single-seed version of this sweep produced 499.8 at 3 bins, 38.7 at
 4, and 500.0 at 5. That is not a curve; it is noise, and it is why this
@@ -163,9 +175,25 @@ So the honest answer is that this experiment cannot separate them. The point
 estimate and the solve counts both favour Q-learning, and the direction is
 consistent with theory. Q-learning learns the greedy policy's value regardless
 of exploration, while SARSA's on-policy target keeps punishing it for the
-ε-greedy moves that end an episode. But eight seeds against a standard deviation
-near 100 is not enough power to call it, and a README that claimed a winner here
-would be claiming something that does not replicate.
+ε-greedy moves that end an episode. But the standard deviation that matters is
+the one of the *differences*, 167.2 — larger than either agent's own (87.5 and
+125.6) — and eight seeds against that is not enough power to call it.
+
+Two things about that non-result are worth stating rather than hiding. **Pairing
+did not buy what it was supposed to.** The rationale was that using the same seed
+for both agents removes the shared difficulty of that seed; in fact the two arms
+are *negatively* correlated (r = −0.206), so the paired standard error is 59.1
+against an unpaired 54.1, 9.2% **wider**. A seed only fixes an RNG stream, and
+two agents that consume randomness differently are on unrelated trajectories
+after their first differing update. The paired test is still what is reported,
+because it is the correct analysis for a paired design and switching to the
+unpaired one — which gives p = 0.033 — because it crosses 0.05 would be choosing
+the answer.
+
+**And one seed carries the result.** Leaving out seed 5042, the single run where
+SARSA hit 500.00 and Q-learning managed 276.20, moves p from 0.064 to **0.0022**.
+Every other seed leaves the conclusion untouched. "Underpowered" and "one
+influential observation" call for different remedies, and this is the second.
 
 The evidence for that is in this repository's own history. A single-seed run
 scored Q-learning 408.41 and SARSA 500.00, the reverse of the eight-seed

@@ -1,0 +1,97 @@
+{
+  "agent_comparison": {
+    "correlation_between_arms": -0.2063,
+    "leave_one_out_p": {
+      "1042": 0.1212,
+      "2042": 0.1051,
+      "3042": 0.0994,
+      "4042": 0.1006,
+      "42": 0.1346,
+      "5042": 0.0022,
+      "6042": 0.1246,
+      "7042": 0.1129
+    },
+    "mean_difference": 129.8,
+    "most_influential_unit": "5042",
+    "n_pairs": 8,
+    "note": "The paired test is the one reported: it is the correct analysis for a paired design, and switching to whichever test gives a smaller p would be choosing the answer. The unpaired p is shown only because pairing did not reduce variance here, which is worth knowing and is not what the design assumed.",
+    "p_paired": 0.0641,
+    "p_unpaired_for_contrast": 0.0328,
+    "pairing_reduced_variance": false,
+    "sd_of_differences": 167.18,
+    "se_paired": 59.11,
+    "se_unpaired": 54.1
+  },
+  "resolution_sweep": {
+    "pooled_extremes": {
+      "coarse_bins": [
+        3,
+        4
+      ],
+      "coarse_mean": 279.08,
+      "fine_bins": [
+        10,
+        12
+      ],
+      "fine_mean": 465.01,
+      "welch_p": 0.0095
+    },
+    "spread": {
+      "ceiling_normalised": [
+        {
+          "bins": 3,
+          "normalised": 0.711,
+          "sd": 177.7
+        },
+        {
+          "bins": 4,
+          "normalised": 0.8,
+          "sd": 193.73
+        },
+        {
+          "bins": 5,
+          "normalised": 0.837,
+          "sd": 146.72
+        },
+        {
+          "bins": 6,
+          "normalised": 0.559,
+          "sd": 126.79
+        },
+        {
+          "bins": 8,
+          "normalised": 0.54,
+          "sd": 91.8
+        },
+        {
+          "bins": 10,
+          "normalised": 0.42,
+          "sd": 59.08
+        },
+        {
+          "bins": 12,
+          "normalised": 0.301,
+          "sd": 33.78
+        }
+      ],
+      "corr_mean_sd": -0.8528,
+      "normalised_collapse_factor": 2.36,
+      "note": "sd is divided by sqrt(mean * (500 - mean)), the largest value it could take at that mean given the hard cap on return. The raw collapse overstates the reliability gain because a higher mean mechanically compresses the spread.",
+      "raw_collapse_factor": 5.26,
+      "raw_sd_first_to_last": [
+        177.7,
+        33.78
+      ],
+      "sd_is_monotonic": false
+    },
+    "trend": {
+      "n_runs": 35,
+      "note": "Bin count is an ordered factor, so a trend test uses information that pairwise comparisons discard.",
+      "slope_p": 0.002,
+      "slope_per_doubling": 106.26,
+      "spearman_p": 0.0315,
+      "spearman_rho": 0.3643
+    }
+  },
+  "source": "post-hoc analysis of the stored runs; nothing was re-trained"
+}

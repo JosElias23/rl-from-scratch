@@ -117,14 +117,34 @@ FrozenLake has 16 states. CartPole has four continuous dimensions, so a tabular
 method needs the state space cut up first, and that cut is the entire modelling
 decision.
 
-### 4.1 Bins are placed on percentiles of observed rollouts, not on the
-observation-space bounds
+### 4.1 The bounds are hand-set, and that choice matters more than the bin count
 
-Gymnasium reports pole velocity bounds of ±∞ and cart velocity bounds that are
-never remotely approached in practice. Splitting the declared range uniformly
-puts almost every visited state into one or two bins and leaves the rest empty.
-`src/rlfs/discretize.py` fits edges on percentiles of states actually visited by
-random rollouts, so the bins land where the data is.
+**Correction.** An earlier version of this section claimed the edges were fitted
+on percentiles of states visited by random rollouts. They are not, and never
+were. `src/rlfs/discretize.py` builds equal-width edges with
+`np.linspace(low, high, n + 1)[1:-1]` over the hard-coded `CARTPOLE_BOUNDS`, and
+a search for `percentile`, `quantile` or `rollout` across the repository returns
+nothing. The README and the module's own docstring both described this correctly
+throughout; only this file was wrong. Leaving it would have been the exact
+failure the rest of this portfolio is about, so it is stated rather than quietly
+edited.
+
+What the code actually does, and why:
+
+Gymnasium declares the cart-velocity and pole-angular-velocity ranges as
+infinite, so a finite bound has to come from somewhere. The four ranges in
+`CARTPOLE_BOUNDS` are the operating region a pole under control actually
+occupies — ±2.4 for cart position because that is the track limit, ±0.21 rad for
+pole angle because termination is at ±0.2095, and ±3.0 for the two velocities by
+observation.
+
+The bound, not the bin count, is the decision that moves the numbers. Too wide
+and resolution is spent on states the cart never reaches; too narrow and
+everything past it saturates into the outermost bin. Fitting percentiles would
+be a defensible way to set them and is listed in section 6 as not done.
+
+The honest consequence is stated in the README: a different choice of bounds
+would move every CartPole number in this repository.
 
 ### 4.2 Resolution is swept, not chosen
 
@@ -145,10 +165,15 @@ single seed would conclude that 6 bins is worse than 5 and stop there. Across
 five seeds the standard deviations are 146.72 and 126.79, so that reversal is
 comfortably inside the noise and means nothing.
 
-The column that is monotonic is the one nobody reports. **Standard deviation
-falls from 177.70 to 33.78 as resolution rises, and seeds solved goes from 2/5
-to 5/5.** Finer discretisation does not mainly make the agent better; it makes
-it *reliable*. Coarse bins force distinct states to share a Q-value, so whether
+**Correction.** An earlier version of this section called the standard-deviation
+column "the one that is monotonic". It is not: 3 bins to 4 bins is 177.70 to
+193.73, an increase — the same kind of reversal dismissed as noise in the mean
+column two sentences earlier. It also claimed finer bins do not mainly make the
+agent better. A trend test says otherwise (section 4.2.1).
+
+What holds: **spread falls from 177.70 to 33.78 as resolution rises, and seeds
+solved goes from 2/5 to 5/5.** Finer discretisation makes the agent both better
+and more reliable. Coarse bins force distinct states to share a Q-value, so whether
 the run works depends on whether that collision happened somewhere harmful, and
 that is a coin flip decided by the seed.
 
@@ -156,6 +181,44 @@ The classic objection is that finer bins are slower to fill: at 12 bins only
 27.2% of the 20,736 cells are ever visited. That turns out not to matter, since
 the unvisited cells are unreachable configurations rather than gaps in
 knowledge. Within the budget tested, finer wins on every axis that counts.
+
+### 4.2.1 The right test for an ordered factor
+
+The sweep originally concluded "the means are statistically indistinguishable"
+from a rule in `scripts/sweep_resolution.py`: two settings were called
+indistinguishable when their 95% intervals overlapped. That rule is wrong twice.
+
+Overlapping intervals are not a test of a difference. Two estimates whose
+intervals overlap can still differ significantly, and the overlap rule is far
+more conservative than the test it stands in for. And bin count is an **ordered**
+factor with seven levels, so comparing each level against the best one discards
+the ordering, which is most of the information in the design.
+
+`scripts/analyse_results.py` runs the tests that use it, over the same 35 stored
+runs — nothing is re-trained:
+
+| Test | Result |
+|---|---|
+| Spearman ρ(bins, return) | +0.364, p = 0.0315 |
+| OLS slope on log₂(bins) | +106.3 return per doubling, p = 0.0020 |
+| 3–4 bins (279.1) vs 10–12 bins (465.0) | Welch p = 0.0095 |
+
+So there **is** a mean effect of resolution. The original analysis could not
+localise it to any adjacent pair and reported that as evidence of no effect —
+which is exactly the move section 5 correctly refuses to make for Q-learning
+against SARSA ninety lines later. The repository was applying its own standard
+inconsistently.
+
+The reliability claim also needed deflating. Return is capped at 500, so the
+largest standard deviation attainable at mean *m* is √(m(500−m)). Across the
+seven resolutions the correlation between mean and sd is −0.853, and normalising
+by that ceiling turns the advertised 5.26× collapse into **2.36×** — and stops it
+being monotone (0.711, 0.800, 0.837, 0.559, 0.540, 0.420, 0.301). A real part of
+what was sold as "reliability, not mean performance" is the mean improving and
+reappearing as a truncation effect.
+
+`sweep_resolution.py` still prints which intervals overlap, because that is what
+it computes, but it now says plainly that this is not a test and points here.
 
 ---
 

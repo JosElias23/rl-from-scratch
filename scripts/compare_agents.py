@@ -121,8 +121,16 @@ def main() -> int:
             "seeds_solved": int(sum(r["solved"] for r in subset)),
         }
 
-    # Paired comparison: the same seed for both agents removes the shared
-    # difficulty of that seed and is far more sensitive than comparing means.
+    # Paired comparison, because the design is paired: both agents were run on
+    # the same seeds. Note what this does NOT buy here. The usual argument is
+    # that pairing removes the shared difficulty of a seed, but a seed only
+    # fixes an RNG stream, and two agents that consume randomness differently
+    # are on unrelated trajectories after their first differing update. The two
+    # arms turn out to be negatively correlated, so pairing widens the interval
+    # rather than narrowing it. The paired test is still the right one to report
+    # for a paired design -- switching to whichever test gives a smaller p would
+    # be choosing the answer -- but the reason for it was wrong, and
+    # scripts/analyse_results.py quantifies that.
     shared = sorted(set(by_seed["q_learning"]) & set(by_seed["sarsa"]))
     differences = np.array(
         [by_seed["q_learning"][s] - by_seed["sarsa"][s] for s in shared]

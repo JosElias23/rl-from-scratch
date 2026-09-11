@@ -153,7 +153,13 @@ def main() -> int:
         >= best["mean_return"] - 1.96 * best["stderr_return"]
     ]
     print(f"Best mean: {best['bins']} bins ({best['mean_return']:.1f}).")
-    print(f"Statistically indistinguishable from it: {overlapping}")
+    print(f"Intervals overlapping it: {overlapping}")
+    print()
+    print("Overlapping intervals are NOT a test of a difference: they are far too")
+    print("conservative, and two estimates whose intervals overlap can still differ")
+    print("significantly. Bin count is also an ordered factor, so comparing pairs")
+    print("throws the ordering away. Run scripts/analyse_results.py for the trend")
+    print("test, which finds an effect this pairwise view cannot localise.")
     return 0
 
 

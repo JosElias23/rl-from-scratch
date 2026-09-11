@@ -117,7 +117,7 @@ truncamiento de 500 pasos. La pregunta interesante, entonces, no es si los
 métodos tabulares pueden resolver CartPole -- sí pueden -- sino con qué
 confiabilidad, y cuánto cuesta la discretización.
 
-### La resolución compra confiabilidad, no rendimiento medio
+### La resolución compra ambas cosas, y la primera versión repartió mal el crédito
 
 ![Barrido de resolución](reports/figures/cartpole_resolution_sweep.png)
 
@@ -143,11 +143,24 @@ la única que nunca falla. Las celdas no visitadas resultan ser estados
 acelerando en sentido contrario es una configuración que la dinámica nunca
 produce. Los bins más finos, en su mayoría, subdividen espacio vacío.
 
-Lo que la resolución realmente compra es **confiabilidad**. Las medias de 4 a 12
-bins son estadísticamente indistinguibles; la desviación estándar entre seeds se
-desploma de 177,7 a 33,8. Una discretización gruesa no da un agente peor en
-promedio; da una lotería. Con tres bins la tarea se resolvió dos veces en cinco
-corridas, y en otra el puntaje fue 100.
+La resolución compra las dos cosas, y la primera versión de este README repartió
+mal el crédito. Decía que las medias eran estadísticamente indistinguibles y que
+solo mejoraba la dispersión. Esa conclusión salía de mirar si los intervalos del
+95 % se solapaban, que no es una prueba de diferencia y es demasiado
+conservador — y además descartaba que el número de bins es un factor
+**ordenado**. Una prueba de tendencia sobre las mismas 35 corridas da **+106,3 de
+retorno por cada duplicación de bins, p = 0,0020** (Spearman ρ = +0,364,
+p = 0,0315), y agrupar 3–4 bins contra 10–12 da Welch **p = 0,0095**. Sí hay
+efecto sobre la media; la vista por pares simplemente no podía localizarlo en
+ningún par adyacente.
+
+La dispersión también mejora, de 177,7 a 33,8 — pero parte de eso es aritmética,
+no confiabilidad. El retorno está topado en 500, así que la mayor desviación
+estándar que puede tener una media *m* es √(m(500−m)): 250 con m = 246 y solo 112
+con m = 473. Normalizando por ese techo, el desplome de 5,26× queda en **2,36×**.
+Una discretización gruesa sí da una lotería — con tres bins la tarea se resolvió
+dos veces en cinco corridas y en otra el puntaje fue 100 — pero también da un
+agente peor en promedio, y la redacción anterior negaba esa segunda mitad.
 
 Una versión anterior de este barrido, con una sola seed, produjo 499,8 con 3
 bins, 38,7 con 4 y 500,0 con 5. Eso no es una curva; es ruido, y es la razón por
@@ -171,9 +184,25 @@ la estimación puntual como el conteo de seeds resueltas favorecen a Q-learning,
 la dirección es consistente con la teoría. Q-learning aprende el valor de la
 política greedy sin importar cómo explore, mientras que el objetivo on-policy de
 SARSA lo sigue castigando por los movimientos ε-greedy que terminan un episodio.
-Pero ocho seeds contra una desviación estándar cercana a 100 no dan poder
-suficiente para declararlo, y un README que aquí proclamara un ganador estaría
-afirmando algo que no replica.
+Pero la desviación estándar que importa es la de las *diferencias*, 167,2 —mayor
+que la de cualquiera de los dos agentes por separado (87,5 y 125,6)— y ocho seeds
+contra eso no dan poder suficiente para declararlo.
+
+Dos cosas sobre ese no-resultado merecen decirse en vez de esconderse. **Aparear
+no compró lo que se suponía.** El argumento era que usar la misma seed para ambos
+agentes elimina la dificultad compartida de esa seed; en realidad los dos brazos
+están correlacionados *negativamente* (r = −0,206), así que el error estándar
+apareado es 59,1 contra 54,1 del no apareado: **9,2 % más ancho**. Una seed solo
+fija un flujo de números aleatorios, y dos agentes que consumen aleatoriedad de
+forma distinta quedan en trayectorias sin relación después de su primera
+actualización divergente. La prueba apareada sigue siendo la que se reporta,
+porque es el análisis correcto para un diseño apareado y cambiar a la no apareada
+—que da p = 0,033— porque cruza el 0,05 sería elegir la respuesta.
+
+**Y una sola seed carga el resultado.** Quitando la seed 5042, la única corrida
+donde SARSA llegó a 500,00 y Q-learning se quedó en 276,20, p pasa de 0,064 a
+**0,0022**. Cualquier otra seed deja la conclusión intacta. "Poca potencia" y "una
+observación influyente" piden remedios distintos, y este es el segundo.
 
 La evidencia de eso está en la propia historia de este repositorio. Una corrida
 con una sola seed dio 408,41 a Q-learning y 500,00 a SARSA, el orden inverso al
